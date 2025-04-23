@@ -475,6 +475,60 @@ HTML_TEMPLATE = """
         /*     border: 1px dashed var(--color-text-very-dim); */
         /*     border-radius: 0.5rem; */
         /* } */
+
+        /* --- NEW Styles for Top 3 Matches --- */
+        .match-result-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--color-card-border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .match-result-item h4 {
+             margin-top: 0;
+             margin-bottom: 1rem;
+             font-weight: 600;
+             color: var(--color-accent-start);
+        }
+        .match-images {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+        .match-images .image-box {
+            flex: 1; /* Allow boxes to grow */
+            min-width: 150px; /* Minimum width before wrapping */
+        }
+         .match-images .image-box img {
+             max-height: 250px; /* Limit height of match images */
+             width: 100%;
+             object-fit: cover;
+         }
+        .match-metadata {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--color-upload-border);
+            padding-top: 1rem;
+        }
+        .match-metadata h5 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--color-text-dim);
+            font-size: 0.9em;
+        }
+        .match-metadata p {
+            margin: 0.3rem 0;
+            color: var(--color-text-light);
+        }
+         .match-metadata a {
+            color: var(--color-accent-start);
+            text-decoration: none;
+        }
+        .match-metadata a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -515,29 +569,17 @@ HTML_TEMPLATE = """
                  </button>
             </div>
 
-            <div id="resultsSection" class="results-section" style="display: none;"> <!-- Keep results section hidden initially -->
+            <div id="resultsSection" class="results-section" style="display: none;"> 
                 <div id="resultsGrid" class="results-grid">
-                    <!-- Uploaded image box is now MOVED to imagePreviewArea -->
-                     <div class="image-box" id="beforeImageBox">
-                        <h3>Match (Before)</h3>
-                        <img id="beforeImage" src="#" alt="Before Match">
-                    </div>
-                    <div class="image-box" id="afterImageBox">
-                        <h3>Match (After)</h3>
-                        <img id="afterImage" src="#" alt="After Match">
-                    </div>
+                    <!-- Content will be added dynamically by JS -->
                 </div>
 
-                <div id="metadataSection" class="metadata-section">
-                    <h3>Analysis & Details:</h3>
-                    <div id="metadataList">
-                        </div>
-                </div>
-
-                 <div id="similarityScore" class="similarity-score"></div>
-
-
-                 <div id="noAfterMessage" class="status-message error hidden">
+                <!-- REMOVED static beforeImageBox -->
+                <!-- REMOVED static afterImageBox -->
+                <!-- REMOVED static metadataSection -->
+                <!-- REMOVED static similarityScore -->
+                <!-- REMOVED static noAfterMessage -->
+                 <div id="noAfterMessage" class="status-message error" style="display: none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                     <span>Match found, but the corresponding 'After' image is missing or not applicable for this case.</span>
                  </div>
@@ -547,8 +589,9 @@ HTML_TEMPLATE = """
                 </div>
             </div>
 
-            <div id="noMatchMessage" class="status-message error hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg> <span>No suitable match found in our database above the similarity threshold. Please try a different image.</span>
+            <!-- No Match message moved outside results section if needed, or handled by JS -->
+            <div id="noMatchMessage" class="status-message error" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg> <span>No suitable match found in our database. Please try a different image.</span>
             </div>
 
         </div> </div> <script>
@@ -568,14 +611,11 @@ HTML_TEMPLATE = """
         const resultsGrid = document.getElementById('resultsGrid'); // Get the grid itself
         const uploadedImageBox = document.getElementById('uploadedImageBox');
         const uploadedImage = document.getElementById('uploadedImage');
-        const beforeImageBox = document.getElementById('beforeImageBox');
-        const beforeImage = document.getElementById('beforeImage');
-        const afterImageBox = document.getElementById('afterImageBox');
-        const afterImage = document.getElementById('afterImage');
-        const metadataSection = document.getElementById('metadataSection');
-        const metadataList = document.getElementById('metadataList');
-        const similarityScoreDiv = document.getElementById('similarityScore');
-        const noAfterMessage = document.getElementById('noAfterMessage');
+        const afterImage = document.getElementById('afterImage'); // Keep ref? Might be removed
+        // const metadataSection = document.getElementById('metadataSection'); // Removed from HTML
+        // const metadataList = document.getElementById('metadataList'); // Removed from HTML
+        // const similarityScoreDiv = document.getElementById('similarityScore'); // Removed from HTML
+        const noAfterMessage = document.getElementById('noAfterMessage'); // Kept for now, handle display in JS
         const noMatchMessage = document.getElementById('noMatchMessage');
         const retryButton = document.getElementById('retryButton');
 
@@ -606,8 +646,8 @@ HTML_TEMPLATE = """
                  uploadIcon.style.color = 'var(--color-text-dim)'; // Revert icon color
             }
              // Hide specific messages when showing a general error
-             noMatchMessage.classList.add('hidden');
-             noAfterMessage.classList.add('hidden');
+             noMatchMessage.style.display = 'none';
+             noAfterMessage.style.display = 'none';
         }
 
         function resetUI() {
@@ -631,12 +671,12 @@ HTML_TEMPLATE = """
             // Hide main results area
             resultsSection.style.display = 'none';
             // Explicitly hide children of results section just in case
-            beforeImageBox.style.display = 'none';
-            afterImageBox.style.display = 'none';
-            metadataList.innerHTML = ''; // Clear previous metadata
-            metadataSection.style.display = 'none';
-            similarityScoreDiv.style.display = 'none';
-            similarityScoreDiv.textContent = '';
+            // beforeImageBox.style.display = 'none';
+            // afterImageBox.style.display = 'none';
+            // metadataList.innerHTML = ''; // Clear previous metadata
+            // metadataSection.style.display = 'none';
+            // similarityScoreDiv.style.display = 'none';
+            // similarityScoreDiv.textContent = '';
             noMatchMessage.style.display = 'none';
             noAfterMessage.style.display = 'none';
             // Keep animation class reset
@@ -644,112 +684,71 @@ HTML_TEMPLATE = """
         }
 
         function displayResults(result) {
-            // --- Show/Hide using inline styles --- 
-            console.log('[DEBUG] Displaying results (Restructured):', result);
+            console.log('[DEBUG] Displaying results (Top 3):', result);
+            resultsGrid.innerHTML = ''; // Clear previous results
+            noMatchMessage.style.display = 'none'; // Hide no match message
+            noAfterMessage.style.display = 'none'; // Hide no after message (handled per match)
 
-            // 1. Hide the dedicated preview area
-            resultsSection.style.display = 'block';
-            console.log('[DEBUG] DisplayResults: Showing resultsSection.');
+            if (result.success && result.matches && result.matches.length > 0) {
+                let resultsHTML = '';
+                result.matches.forEach((match, index) => {
+                    // --- Metadata generation --- 
+                    let metadataHTML = '';
+                    const meta = match.metadata;
+                    if (meta && Object.keys(meta).length > 0) {
+                         if (meta.case_id) {
+                            metadataHTML += `<p><strong>Case ID:</strong> ${meta.case_id}</p>`;
+                         }
+                         if (meta.procedure_name) {
+                            metadataHTML += `<p><strong>Procedure:</strong> ${meta.procedure_name}</p>`;
+                         }
+                        // Add other potential metadata fields here following the pattern
+                         if (meta.page_url) {
+                            metadataHTML += `<p><a href="${meta.page_url}" target="_blank" rel="noopener noreferrer">View Procedure Details</a></p>`;
+                         }
+                         if (metadataHTML === '') { // If meta exists but has no known fields we check for
+                             metadataHTML = `<p>Additional details available.</p>`;
+                         }
+                    } else {
+                        metadataHTML = '<p>No additional details available.</p>';
+                    }
+                    // --- End Metadata generation ---
 
-            // 2. Handle elements *within* resultsSection 
-            // NOTE: uploadedImageBox is NO LONGER HERE. We might need to add it back 
-            // if we want the final uploaded image displayed alongside matches, 
-            // or re-use the imagePreviewArea. For now, it remains hidden.
+                    // --- HTML for one match item --- 
+                    resultsHTML += `
+                        <div class="match-result-item">
+                            <h4>Match ${index + 1} (Similarity: ${(match.similarity * 100).toFixed(1)}%)</h4>
+                            <div class="match-images">
+                                <div class="image-box">
+                                    <h3>Before</h3>
+                                    <img src="${match.match_before_url}" alt="Before Match ${index + 1}" onerror="this.alt='Error loading image'; this.src='#';">
+                                </div>
+                                <div class="image-box">
+                                    <h3>After</h3>
+                                    ${match.match_after_url ? 
+                                        `<img src="${match.match_after_url}" alt="After Match ${index + 1}" onerror="this.alt='Error loading image'; this.src='#';">` : 
+                                        '<p style="color: var(--color-text-very-dim);">N/A</p>'}
+                                </div>
+                            </div>
+                            <div class="match-metadata">
+                                <h5>Details:</h5>
+                                ${metadataHTML}
+                            </div>
+                        </div>
+                    `;
+                    // --- End HTML for one match item ---
+                });
 
-            // Show before image
-            if (result.match_before_url) {
-                beforeImage.src = result.match_before_url;
-                beforeImageBox.style.display = 'block'; 
-            } else {
-                beforeImageBox.style.display = 'none';
-            }
-
-            // Show after image conditionally
-            if (result.match_after_url) {
-                afterImage.src = result.match_after_url;
-                afterImageBox.style.display = 'block';
-                noAfterMessage.style.display = 'none'; // Hide the 'no after' message
-            } else {
-                afterImageBox.style.display = 'none'; // Hide the box
-                if(result.match_before_url) { // Show the 'no after' message only if a 'before' match was found
-                     noAfterMessage.style.display = 'block';
-                }
-            }
-
-             // Adjust grid columns based on visible items (optional refinement, but good UX)
-            let visibleBoxes = 0;
-            if (beforeImageBox.style.display !== 'none') visibleBoxes++;
-            if (afterImageBox.style.display !== 'none') visibleBoxes++;
-
-            if (visibleBoxes === 2) {
-                 resultsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-            } else {
-                 resultsGrid.style.gridTemplateColumns = '1fr';
-            }
-
-
-            // Display Metadata
-            metadataList.innerHTML = ''; // Clear previous
-            const meta = result.metadata;
-            let detailsHtml = '';
-            let delay = 0;
-            if (meta) {
-                if (meta.case_id) {
-                    detailsHtml += `<div class="metadata-item" style="transition-delay: ${delay}s"><strong>Case ID:</strong> ${meta.case_id}</div>`;
-                    delay += 0.1;
-                }
-                if (meta.procedure_name) {
-                     detailsHtml += `<div class="metadata-item" style="transition-delay: ${delay}s"><strong>Procedure:</strong> ${meta.procedure_name}</div>`;
-                    delay += 0.1;
-                 }
-                // Add other potential metadata fields here following the pattern
-                 if (meta.similarity) { // Display similarity from metadata if present (redundant with score below, but example)
-                     detailsHtml += `<div class="metadata-item" style="transition-delay: ${delay}s"><strong>Similarity (Detail):</strong> ${(meta.similarity * 100).toFixed(2)}%</div>`;
-                     delay += 0.1;
-                 }
-                if (meta.page_url) {
-                     detailsHtml += `<div class="metadata-item" style="transition-delay: ${delay}s"><a href="${meta.page_url}" target="_blank" rel="noopener noreferrer">View Procedure Details</a></div>`;
-                     delay += 0.1;
-                }
-                if (detailsHtml === '') { // If meta exists but has no known fields
-                     detailsHtml = `<div class="metadata-item" style="transition-delay: ${delay}s">Metadata available but content format is unrecognized.</div>`;
-                }
-                 metadataList.innerHTML = detailsHtml;
-                 metadataSection.style.display = 'block';
-
-                 // Trigger staggered animation for metadata items
-                 setTimeout(() => {
-                    const items = metadataList.querySelectorAll('.metadata-item');
-                    items.forEach(item => item.classList.add('visible'));
-                 }, 50); // Small delay to ensure items are in DOM
+                resultsGrid.innerHTML = resultsHTML; // Add all generated HTML at once
+                resultsSection.style.display = 'block'; // Show the main results section
+                console.log(`[DEBUG] Displayed ${result.matches.length} matches.`);
 
             } else {
-                 metadataSection.style.display = 'none';
-                 console.log('[DEBUG] DisplayResults: metadataSection hidden (no metadata)');
+                // Handle case where success is true but matches is empty, or success is false
+                console.log('[DEBUG] No matches found or error occurred.');
+                resultsSection.style.display = 'none'; // Hide results section
+                noMatchMessage.style.display = 'flex'; // Show the main no match message
             }
-
-            // Display Similarity Score - Force display block, handle value check inside
-            similarityScoreDiv.style.display = 'block'; // Always try to show the element
-            similarityScoreDiv.classList.remove('visible'); // Reset animation
-            if (typeof result.similarity === 'number' && !isNaN(result.similarity)) {
-                 similarityScoreDiv.textContent = `Similarity Score: ${(result.similarity * 100).toFixed(2)}%`;
-                 console.log('[DEBUG] DisplayResults: similarityScoreDiv shown (value is number: ' + result.similarity + ')');
-                 // Trigger animation (using class is fine for animation)
-                 setTimeout(() => similarityScoreDiv.classList.add('visible'), 100);
-            } else {
-                 similarityScoreDiv.textContent = 'Similarity Score: N/A'; // Show placeholder
-                 console.warn('[DEBUG] DisplayResults: similarityScoreDiv shown but value is not a valid number:', result.similarity);
-            }
-            
-            // Ensure No Match message is hidden if results are displayed
-
-            // Show the main results section container (already done above) 
-            // resultsSection.style.display = 'block'; // Ensure container is displayed
-            
-            // Handle animation class (if we bring animations back later)
-            // resultsSection.classList.remove('visible'); 
-            // setTimeout(() => resultsSection.classList.add('visible'), 50); 
-             console.log('[DEBUG] DisplayResults: Processing finished.');
         }
 
 
@@ -907,11 +906,11 @@ HTML_TEMPLATE = """
             // Hide specific messages/sections before processing starts
             noMatchMessage.style.display = 'none';
             noAfterMessage.style.display = 'none';
-            metadataSection.style.display = 'none';
-            similarityScoreDiv.style.display = 'none';
+            // metadataSection.style.display = 'none';
+            // similarityScoreDiv.style.display = 'none';
             // Keep the uploaded preview visible, but hide other results
-            beforeImageBox.style.display = 'none';
-            afterImageBox.style.display = 'none';
+            // beforeImageBox.style.display = 'none';
+            // afterImageBox.style.display = 'none';
 
             const formData = new FormData();
             formData.append('file', currentFile); // Use 'file' as the key, matching the target template's expectation
@@ -1021,47 +1020,81 @@ def match_face():
 
 
             # 2. Compare with database embeddings
-            best_match_index = -1
-            min_distance = float('inf')
+            distances = []
 
             for i, db_entry in enumerate(face_database):
-                distance = cosine(uploaded_embedding, db_entry['embedding'])
-                if distance < min_distance:
-                    min_distance = distance
-                    best_match_index = i
+                try:
+                    # Ensure db_entry['embedding'] is a valid numpy array
+                    db_embedding = db_entry.get('embedding')
+                    if db_embedding is None or not isinstance(db_embedding, np.ndarray):
+                        logger.warning(f"Skipping entry {i} due to missing or invalid embedding.")
+                        continue
+                    if db_embedding.shape != uploaded_embedding.shape:
+                         logger.warning(f"Skipping entry {i} due to incompatible embedding shape: {db_embedding.shape} vs {uploaded_embedding.shape}")
+                         continue
 
-            # 3. Prepare results
-            similarity = 1 - min_distance # Convert cosine distance to similarity
+                    distance = cosine(uploaded_embedding, db_embedding)
+                    distances.append({'index': i, 'distance': distance})
+                except Exception as dist_err:
+                     logger.error(f"Error calculating distance for entry {i}: {dist_err}", exc_info=True)
 
-            # Show the best match found, regardless of threshold
-            if best_match_index != -1:
-                match_info = face_database[best_match_index]
-                logger.info(f"Best match found: Upload '{filename}' -> DB '{os.path.basename(match_info['before_path'])}' Similarity: {similarity:.4f} (Threshold ignored)")
-
-                # Generate URLs for the images to be displayed
-                uploaded_url = url_for('uploaded_file', filename=filename)
-                # Use url_for with the database serving routes
-                before_url = url_for('database_image', subdir=BEFORE_FOLDER_NAME, filename=os.path.basename(match_info['before_path']))
-                after_url = url_for('database_image', subdir=AFTER_FOLDER_NAME, filename=os.path.basename(match_info['after_path'])) if match_info['after_path'] else None
-
-                return jsonify({
-                    'success': True,
-                    'message': 'Match found.',
-                    'uploaded_image_url': uploaded_url,
-                    'match_before_url': before_url,
-                    'match_after_url': after_url,
-                    'similarity': similarity,
-                    'metadata': match_info.get('metadata', {})
-                })
-            else:
-                 logger.info(f"No faces found in the database to compare against.")
-                 # Clean up uploaded file if no match is found
+            if not distances:
+                 logger.warning(f"No valid distances calculated for {filename}. Database might have issues.")
                  if os.path.exists(uploaded_filepath):
                       os.remove(uploaded_filepath)
+                 return jsonify({'success': False, 'message': 'Could not compare with database entries.', 'error_type': 'DB_COMPARE_ERROR'})
+
+            # Sort by distance (ascending)
+            distances.sort(key=lambda x: x['distance'])
+
+            # 3. Prepare results for top N matches
+            num_matches_to_show = min(3, len(distances))
+            top_matches_data = []
+
+            logger.info(f"Found {len(distances)} potential matches. Preparing top {num_matches_to_show}.")
+
+            for i in range(num_matches_to_show):
+                match_info = distances[i]
+                db_index = match_info['index']
+                distance = match_info['distance']
+                similarity = 1 - distance
+
+                db_entry = face_database[db_index]
+                logger.info(f"  Match {i+1}: Index {db_index}, Distance: {distance:.4f}, Similarity: {similarity:.4f}, Before: {db_entry.get('before_path')}")
+
+                # Generate URLs for the images
+                before_filename = os.path.basename(db_entry['before_path']) if db_entry.get('before_path') else 'invalid'
+                before_url = url_for('database_image', subdir=BEFORE_FOLDER_NAME, filename=before_filename)
+                
+                after_filename = os.path.basename(db_entry['after_path']) if db_entry.get('after_path') else None
+                after_url = url_for('database_image', subdir=AFTER_FOLDER_NAME, filename=after_filename) if after_filename else None
+                
+                top_matches_data.append({
+                    'similarity': similarity,
+                    'match_before_url': before_url,
+                    'match_after_url': after_url,
+                    'metadata': db_entry.get('metadata', {})
+                })
+
+            # Return results
+            uploaded_url = url_for('uploaded_file', filename=filename)
+            if num_matches_to_show > 0:
+                 logger.info(f"Returning {num_matches_to_show} matches for {filename}.")
+                 return jsonify({
+                    'success': True,
+                    'message': f'{num_matches_to_show} matches found.',
+                    'uploaded_image_url': uploaded_url,
+                    'matches': top_matches_data # List of matches
+                })
+            else:
+                 # This case should be rare if distances were calculated but empty database?
+                 logger.info(f"No matches found in the database for {filename}.")
+                 if os.path.exists(uploaded_filepath):
+                     os.remove(uploaded_filepath)
                  return jsonify({
                     'success': False,
-                    'message': 'No faces found in the database to compare against.',
-                    'error_type': 'DATABASE_EMPTY' # Custom type for JS handling
+                    'message': 'No suitable matches found in the database.',
+                    'error_type': 'NO_MATCH_FOUND'
                  })
 
         except Exception as e:
