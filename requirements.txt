@@ -1,0 +1,7 @@
+Flask
+Flask-Cors
+numpy
+scipy
+deepface
+tensorflow-macos==2.16.2 # Pin specific version for macOS ARM
+tf_keras # Required by retinaface/deepface with TF >= 2.16
