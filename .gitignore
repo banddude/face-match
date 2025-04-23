@@ -143,9 +143,6 @@ cython_debug/
 # Uploads folder
 uploads/
 
-# Database cache file
-database/face_db.pkl
-
 # OS generated files
 .DS_Store
 .DS_Store?
